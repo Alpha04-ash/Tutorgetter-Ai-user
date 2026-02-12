@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int          @id @default(autoincrement())
+  email          String       @unique
+  hashedPassword String?
+  fullName       String?
+  phoneNumber    String?
+  role           String       @default("user") // "admin" or "user"
+  createdAt      DateTime     @default(now())
+  assessments    Assessment[]
+
+  @@map("users")
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  description String?
+  questions   Question[]
+  assessments Assessment[]
+
+  @@map("categories")
+}
+
+model Question {
+  id           Int      @id @default(autoincrement())
+  categoryId   Int
+  text         String
+  source       String   @default("ADMIN") // "ADMIN" or "AI"
+  type         String   @default("THEORY") // "CODE", "THEORY", "TEACHING"
+  metadataJson String? // Stored as JSON string
+  category     Category @relation(fields: [categoryId], references: [id])
+  answers      Answer[]
+
+  @@map("questions")
+}
+
+model Assessment {
+  id                    Int      @id @default(autoincrement())
+  userId                Int
+  categoryId            Int?
+  status                String   @default("pending") // "pending", "completed"
+  finalScore            Float?
+  technicalScore        Float?
+  teachingScore         Float?
+  communicationScore    Float?
+  decision              String? // "GREEN", "YELLOW", "RED"
+  videoUrl              String?
+  candidateNameSnapshot String?
+  createdAt             DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
+  answers  Answer[]
+
+  @@map("assessments")
+}
+
+model Answer {
+  id           Int        @id @default(autoincrement())
+  assessmentId Int
+  questionId   Int
+  answerText   String
+  transcript   String?
+  aiFeedback   String? // Stored as JSON string
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  question     Question   @relation(fields: [questionId], references: [id])
+
+  @@map("answers")
+}
