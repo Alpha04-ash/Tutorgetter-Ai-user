@@ -308,7 +308,7 @@ export default function AssessmentFlow({ categoryId, questions }: AssessmentFlow
                 <div className="w-80 p-6 flex flex-col gap-4 hidden lg:flex">
                     <div className="sticky top-6">
                         <div className="aspect-video rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-black relative group">
-                            <CameraRecorder ref={cameraRef} onDataAvailable={(blob) => { /* streaming handled internally usually */ }} />
+                            <CameraRecorder ref={cameraRef} />
                             <div className="absolute inset-0 border-2 border-white/5 pointer-events-none rounded-xl"></div>
                         </div>
                         <p className="text-xs text-center text-slate-500 mt-2">
